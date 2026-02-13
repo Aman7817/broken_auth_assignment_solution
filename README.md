@@ -76,4 +76,4 @@ The goal was to fix login, OTP verification, session handling, JWT token generat
 Aman Singh
 Backend Developer (Learning Phase)
 
-GitHub: [https://github.com/YOUR_USERNAME](https://github.com/YOUR_USERNAME)
+GitHub: [https://github.com/Aman7817](https://github.com/Aman7817)

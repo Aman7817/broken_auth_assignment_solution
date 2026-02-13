@@ -10,7 +10,8 @@ const generateToken = async (email) => {
       .update(email)
       .digest("base64");
   } catch (error) {
-    // THE BUG: Empty catch block.
+    console.error("Token generation error:",error);
+    throw error;
     // Error is swallowed and undefined is returned.
   }
 };

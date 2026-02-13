@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
@@ -15,6 +16,7 @@ const otpStore = {};
 // Middleware
 app.use(requestLogger);
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.get("/", (req, res) => {
@@ -28,7 +30,11 @@ app.get("/", (req, res) => {
 // CHANGE 1: /auth/login endpoint
 app.post("/auth/login", (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body
+    console.log("email", email);
+    console.log("Password", password);
+    
+
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password required" });
@@ -49,7 +55,7 @@ app.post("/auth/login", (req, res) => {
     // Store OTP
     otpStore[loginSessionId] = otp;
 
-    console.log(`[OTP] Session ${loginSessionId} generated`);
+    console.log(`[OTP] Session ${loginSessionId} generated - OTP: ${otp}`);
 
     return res.status(200).json({
       message: "OTP sent",
@@ -109,7 +115,7 @@ app.post("/auth/verify-otp", (req, res) => {
 
 app.post("/auth/token", (req, res) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.cookies.session_token;
 
     if (!token) {
       return res
@@ -117,14 +123,14 @@ app.post("/auth/token", (req, res) => {
         .json({ error: "Unauthorized - valid session required" });
     }
 
-    const session = loginSessions[token.replace("Bearer ", "")];
+    const session = loginSessions[token];
 
     if (!session) {
       return res.status(401).json({ error: "Invalid session" });
     }
 
     // Generate JWT
-    const secret = process.env.JWT_SECRET || "default-secret-key";
+    const secret = process.env.JWT_SECRET;
 
     const accessToken = jwt.sign(
       {
@@ -151,6 +157,7 @@ app.post("/auth/token", (req, res) => {
 
 // Protected route example
 app.get("/protected", authMiddleware, (req, res) => {
+  console.log("Protected route hit"); 
   return res.json({
     message: "Access granted",
     user: req.user,
